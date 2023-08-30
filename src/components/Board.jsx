@@ -4,12 +4,28 @@ import Square from "./Square"
 const Board = () => {
 
   const [squares, setSquares] = useState(Array(9).fill(null))
+  const [xIsNext, setXIsNext] = useState(true)
+
 
   const handleClick = (i) => {
+    if (squares[i] || calaculateWinner(squares)) {
+      return;
+    }
     const copySquares = squares.slice()
-    copySquares[i] = "X"
+    xIsNext ? copySquares[i] = "X" : copySquares[i] = "O"
     setSquares(copySquares)
+    setXIsNext(!xIsNext)
   }
+
+  let winner = calaculateWinner(squares)
+  let status;
+  if (winner) {
+    status = "Winner is : " + winner
+  }
+  else {
+    status = "Next Palyer is : " + (xIsNext ? "X" : "O")
+  }
+
   return (
     <section className="text-center">
       <h1 className="text-2xl font-bold">TIC <span className="text-red-500">TAC</span> TOE</h1>
@@ -30,8 +46,33 @@ const Board = () => {
           <Square value={squares[8]} onSquareClick={() => { handleClick(8) }} />
         </div>
       </div>
+      <h1 className="mt-4 text-2xl">{status}</h1>
+      <button className="mt-4 text-xl border-2 py-2 px-4 rounded-full hover:border-green-500 hover:text-green-500">
+        RELOAD
+      </button>
     </section>
   )
 }
 
 export default Board
+
+const calaculateWinner = (squares) => {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [6, 7, 8]
+  ]
+
+  for (let i = 0; i < lines.length; i++) {
+    let [a, b, c] = lines[i]
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
